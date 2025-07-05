@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Row, Col, Statistic, Table, Typography, Divider } from 'antd';
 import { PieChart, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, Legend } from 'recharts';
+import noticiasMock from './biblioteca_publicacoes_mock.json';
 
 const { Title, Text } = Typography;
 
@@ -10,18 +11,83 @@ const formatMilhoes = (valor, prefix = '', sufix = ' M') => {
 };
 
 const Dashboard = ({ data, tema }) => {
-  if (!data) return null;
+  // Se não receber data, gera a partir do JSON e do tema
+  let dashboardData = data;
+  if (!dashboardData) {
+    // Filtra notícias pelo tema, se fornecido
+    let noticias = noticiasMock;
+    if (tema) {
+      const termoLower = tema.toLowerCase();
+      noticias = noticiasMock.filter(n =>
+        (n['Título'] || '').toLowerCase().includes(termoLower) ||
+        (n['Conteúdo'] || '').toLowerCase().includes(termoLower) ||
+        (n['Assunto específico'] || '').toLowerCase().includes(termoLower)
+      );
+    }
+    // Mapeia para o formato esperado
+    const noticiasFormatadas = noticias.map(n => ({
+      titulo: n['Título'],
+      fonte: n['Fonte'],
+      data: n['Data'],
+      descricao: n['Conteúdo'],
+      sentimento: 'neutro', // pode usar função de sentimento se desejar
+      impressoes: parseInt((n['Alcance orgânico'] || '0').replace(/[^\d]/g, '')),
+      valoracao: parseFloat((n['Valoração'] || '0').replace(/[^\d,]/g, '').replace(',', '.'))
+    }));
+    // Indicadores
+    const totalPublicacoes = noticiasFormatadas.length;
+    const totalImpressoes = noticiasFormatadas.reduce((acc, n) => acc + (n.impressoes || 0), 0);
+    const totalValoracao = noticiasFormatadas.reduce((acc, n) => acc + (n.valoracao || 0), 0);
+    const totalFontes = new Set(noticiasFormatadas.map(n => n.fonte)).size;
+    // Evolução por data
+    const evolucaoMap = {};
+    noticiasFormatadas.forEach(n => {
+      const dataKey = n.data.split(' ')[0];
+      if (!evolucaoMap[dataKey]) evolucaoMap[dataKey] = { data: dataKey, publicacoes: 0, impressoes: 0 };
+      evolucaoMap[dataKey].publicacoes += 1;
+      evolucaoMap[dataKey].impressoes += n.impressoes || 0;
+    });
+    const evolucao = Object.values(evolucaoMap).sort((a, b) => new Date(a.data.split('/').reverse().join('-')) - new Date(b.data.split('/').reverse().join('-')));
+    // Resultados por mídia
+    const midiasMap = {};
+    noticiasFormatadas.forEach(n => {
+      if (!midiasMap[n.fonte]) midiasMap[n.fonte] = { fonte: n.fonte, publicacoes: 0, impressoes: 0, valoracao: 0 };
+      midiasMap[n.fonte].publicacoes += 1;
+      midiasMap[n.fonte].impressoes += n.impressoes || 0;
+      midiasMap[n.fonte].valoracao += n.valoracao || 0;
+    });
+    const midias = Object.values(midiasMap).sort((a, b) => b.impressoes - a.impressoes);
+    // Top 10 fontes
+    const topFontes = midias.slice(0, 10);
+    // Top 5 matérias
+    const topMaterias = noticiasFormatadas
+      .sort((a, b) => (b.impressoes || 0) - (a.impressoes || 0))
+      .slice(0, 5)
+      .map(n => ({ titulo: n.titulo, impressoes: n.impressoes, valoracao: n.valoracao }));
+    dashboardData = {
+      bigNumbers: {
+        totalPublicacoes,
+        totalImpressoes,
+        totalValoracao,
+        totalFontes
+      },
+      evolucao,
+      midias,
+      topFontes,
+      topMaterias
+    };
+  }
 
   // Big Numbers
   const bigs = [
-    { label: 'Publicações', value: data.bigNumbers.totalPublicacoes },
-    { label: 'Impressões', value: formatMilhoes(data.bigNumbers.totalImpressoes) },
-    { label: 'Valoração', value: formatMilhoes(data.bigNumbers.totalValoracao, 'R$') },
-    { label: 'Fontes', value: data.bigNumbers.totalFontes }
+    { label: 'Publicações', value: dashboardData.bigNumbers.totalPublicacoes },
+    { label: 'Impressões', value: formatMilhoes(dashboardData.bigNumbers.totalImpressoes) },
+    { label: 'Valoração', value: formatMilhoes(dashboardData.bigNumbers.totalValoracao, 'R$') },
+    { label: 'Fontes', value: dashboardData.bigNumbers.totalFontes }
   ];
 
   // Gráfico de evolução
-  const evolucao = data.evolucao.map(e => ({ ...e, data: e.data.slice(8, 10) + '/' + e.data.slice(5, 7) + '/' + e.data.slice(0, 4) }));
+  const evolucao = dashboardData.evolucao.map(e => ({ ...e, data: e.data.slice(8, 10) + '/' + e.data.slice(5, 7) + '/' + e.data.slice(0, 4) }));
 
   // Tabela de mídias
   const midiasColumns = [
@@ -32,7 +98,7 @@ const Dashboard = ({ data, tema }) => {
   ];
 
   // Top 10 fontes (bar chart)
-  const topFontes = data.topFontes;
+  const topFontes = dashboardData.topFontes;
 
   // Top 5 matérias (tabela)
   const topMateriasColumns = [
@@ -71,7 +137,7 @@ const Dashboard = ({ data, tema }) => {
       </Card>
       <Divider orientation="left" style={{ color: '#6c4ed9' }}>Resultados por mídia</Divider>
       <Card style={{ marginBottom: 24, borderRadius: 16 }}>
-        <Table columns={midiasColumns} dataSource={data.midias} size="small" pagination={false} rowKey="fonte" />
+        <Table columns={midiasColumns} dataSource={dashboardData.midias} size="small" pagination={false} rowKey="fonte" />
       </Card>
       <Row gutter={24}>
         <Col span={12}>
@@ -90,7 +156,7 @@ const Dashboard = ({ data, tema }) => {
         <Col span={12}>
           <Divider orientation="left" style={{ color: '#6c4ed9' }}>Top 5 matérias que mais geraram visualizações</Divider>
           <Card style={{ borderRadius: 16 }}>
-            <Table columns={topMateriasColumns} dataSource={data.topMaterias} size="small" pagination={false} rowKey="titulo" />
+            <Table columns={topMateriasColumns} dataSource={dashboardData.topMaterias} size="small" pagination={false} rowKey="titulo" />
           </Card>
         </Col>
       </Row>

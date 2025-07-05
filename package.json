@@ -2,11 +2,9 @@
   "name": "flash-report-fullstack",
   "private": true,
   "scripts": {
-    "start": "concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\"",
+    "start": "npm run start --prefix frontend",
     "build:frontend": "npm run build --prefix frontend",
-    "deploy:frontend": "npm run deploy --prefix frontend",
-    "start:backend": "npm run start --prefix backend",
-    "test:backend": "npm test --prefix backend"
+    "deploy:frontend": "npm run deploy --prefix frontend"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"

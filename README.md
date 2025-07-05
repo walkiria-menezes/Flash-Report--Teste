@@ -1,4 +1,4 @@
-# Flash Report - Plataforma SaaS de Monitoramento de Comunicação e Reputação
+# Flash Report - Plataforma de Monitoramento de Comunicação e Reputação
 
 ## Passo a Passo Rápido: Como Rodar e Publicar o Projeto
 
@@ -14,15 +14,14 @@ No diretório raiz do projeto, rode:
 npm install
 ```
 
-Depois, instale as dependências do frontend e backend:
+Depois, instale as dependências do frontend:
 
 ```sh
-cd backend && npm install
-cd ../frontend && npm install
+cd frontend && npm install
 cd ..
 ```
 
-### 2. Rodando o projeto localmente (frontend + backend juntos)
+### 2. Rodando o projeto localmente
 
 No diretório raiz, rode:
 
@@ -30,52 +29,33 @@ No diretório raiz, rode:
 npm start
 ```
 
-- O backend rodará em `http://localhost:4000`
-- O frontend rodará em `http://localhost:3000`
+O projeto rodará em `http://localhost:3000`
 
-### 3. Build do frontend
+### 3. Build do projeto
 
-Para gerar a versão de produção do frontend:
-
-```sh
-cd frontend
-npm run build
-```
-
-### 4. Publicando o frontend no GitHub Pages
-
-1. Certifique-se de que o campo `homepage` em `frontend/package.json` está correto.
-2. No diretório `frontend`, rode:
+Para gerar a versão de produção:
 
 ```sh
-npm run deploy
+npm run build:frontend
 ```
 
-O site ficará disponível em: `https://SEU_USUARIO.github.io/NOME_DO_REPOSITORIO`
+### 4. Publicando no GitHub Pages
 
-### 5. Publicando o backend (Node.js) na nuvem
+No diretório raiz, rode:
 
-Recomendado: [Render](https://render.com/) ou [Railway](https://railway.app/)
+```sh
+npm run deploy:frontend
+```
 
-- Crie uma conta e conecte seu repositório.
-- Configure o diretório raiz do serviço como `backend/`.
-- Build command: `npm install`
-- Start command: `node src/index.js`
-- O serviço irá gerar uma URL pública para sua API.
-
-**Lembre-se de atualizar os endpoints do frontend para usar a URL pública do backend em produção!**
+O site ficará disponível em: `https://walkiria-menezes.github.io/Flash-Report--Teste`
 
 ---
 
 # Documentação Completa
 
-(Conteúdo abaixo é a documentação detalhada do sistema)
-
-# Flash Report - Plataforma SaaS de Monitoramento de Comunicação e Reputação
-
 ## Visão Geral
 
-O Flash Report é um módulo de plataforma SaaS que permite ao usuário monitorar temas, empresas ou assuntos na mídia, gerando relatórios rápidos (flash reports) e dashboards interativos com indicadores de comunicação e reputação. O sistema conta com um agente conversacional (chatbot) que entende perguntas naturais, busca notícias reais de uma base de dados CSV e, sob demanda, gera dashboards dinâmicos com gráficos, big numbers e tabelas.
+O Flash Report é uma plataforma de monitoramento de comunicação e reputação que permite ao usuário monitorar temas, empresas ou assuntos na mídia, gerando relatórios rápidos (flash reports) e dashboards interativos com indicadores de comunicação e reputação. O sistema conta com um agente conversacional (chatbot) que entende perguntas naturais, busca notícias de uma base de dados JSON e, sob demanda, gera dashboards dinâmicos com gráficos, big numbers e tabelas.
 
 ---
 
@@ -100,45 +80,41 @@ O Flash Report é um módulo de plataforma SaaS que permite ao usuário monitora
 - **Indicadores em milhões:** Os indicadores de Impressões e Valoração agora são exibidos no formato de milhões (Ex: 3,84 M e R$9,1 M), facilitando a leitura de grandes números.
 - **Título dinâmico:** O título do dashboard agora exibe dinamicamente o nome do tema consultado pelo usuário no chat.
 - **Gráfico de evolução aprimorado:** O gráfico "Evolução de publicações x impressões" agora apresenta barras para o total de publicações por dia e uma linha para as impressões, permitindo melhor comparação visual.
-- **Tabela de mídias fiel ao backend:** A tabela "Resultados por mídia" reflete exatamente as opções de mídia/fonte presentes no backend, mostrando o total de publicações, impressões e valoração para cada mídia.
+- **Tabela de mídias fiel aos dados:** A tabela "Resultados por mídia" reflete exatamente as opções de mídia/fonte presentes nos dados, mostrando o total de publicações, impressões e valoração para cada mídia.
 - **Integração tema-chat/dashboard:** O dashboard recebe e exibe corretamente o tema buscado pelo usuário, garantindo contexto em todas as visualizações.
 
 ---
 
 ## Tecnologias Utilizadas
 
-- **Frontend:** React.js, Ant Design, Recharts, Chart.js, Axios
-- **Backend:** Node.js, Express
-- **Dados:** Base de notícias reais em arquivo CSV + dados mockados como fallback
-- **Processamento:** csv-parser, date-fns para normalização de dados
-- **Comunicação:** API REST
+- **Frontend:** React.js, Ant Design, Recharts, Chart.js
+- **Dados:** Base de notícias em arquivo JSON (`biblioteca_publicacoes_mock.json`)
+- **Processamento:** Processamento local de dados no frontend
+- **Deploy:** GitHub Pages
 
 ---
 
 ## Estrutura de Pastas
 
 ```
-flash-report/
-│
-├── backend/
-│   ├── package.json
-│   ├── Biblioteca_de_publicacoes3.csv    # Base de dados real
-│   └── src/
-│       ├── index.js                      # Servidor Express e endpoints
-│       ├── mockNoticias.js               # Base de notícias mockadas (fallback)
-│       └── csvProcessor.js               # Processador de dados CSV
+Flash Report [Teste 3]/
 │
 ├── frontend/
-│   ├── package.json
+│   ├── package.json                    # Dependências e scripts do frontend
+│   ├── csv_to_json.js                  # Script para converter CSV para JSON
+│   ├── public/
+│   │   └── index.html                  # HTML base da aplicação
 │   └── src/
-│       ├── App.js
-│       ├── components/
-│       │   ├── Chat.js                   # Componente do chat conversacional
-│       │   └── Dashboard.js              # Componente do dashboard
-│       └── index.js
+│       ├── App.js                      # Componente principal da aplicação
+│       ├── index.js                    # Ponto de entrada do React
+│       └── components/
+│           ├── Chat.js                 # Componente do chat conversacional
+│           ├── Dashboard.js            # Componente do dashboard
+│           └── biblioteca_publicacoes_mock.json  # Base de dados das notícias
 │
-└── @docs/
-    └── README.md                         # Este documento
+├── package.json                        # Scripts do projeto raiz
+├── package-lock.json                   # Lock file das dependências
+└── README.md                           # Este documento
 ```
 
 ---
@@ -151,38 +127,30 @@ flash-report/
 
 ### 1. Instale as dependências
 
-No backend:
+No diretório raiz do projeto:
 ```bash
-cd backend
-npm install
-```
-No frontend:
-```bash
-cd frontend
 npm install
 ```
 
-### 2. Inicie o backend
-```bash
-cd backend
-npm start
-```
-O backend roda por padrão em `http://localhost:4000`.
-
-**Nota:** O backend automaticamente carrega os dados reais do arquivo `Biblioteca_de_publicacoes3.csv`. Se o arquivo não for encontrado ou houver erro, o sistema usa os dados mockados como fallback.
-
-### 3. Inicie o frontend
+No diretório frontend:
 ```bash
 cd frontend
+npm install
+cd ..
+```
+
+### 2. Inicie o projeto
+```bash
 npm start
 ```
-O frontend roda por padrão em `http://localhost:3000`.
+
+O projeto roda em `http://localhost:3000`.
 
 ---
 
 ## Como Usar
 
-1. **Acesse o frontend** em `http://localhost:3000`.
+1. **Acesse o projeto** em `http://localhost:3000`.
 2. **Digite um tema, empresa ou assunto** no chat (ex: "Dia dos Namorados", "Energia Nuclear", "Papa Leão XIV", "The Town", "Maternidade").
 3. O chat responde com o número de notícias encontradas e sugere filtros de período ou, se houver muitos resultados, sugere ações inteligentes.
 4. **Ações inteligentes:**
@@ -197,38 +165,19 @@ O frontend roda por padrão em `http://localhost:3000`.
 
 ## Funcionalidades
 
-- **Chatbot conversacional:** Interpreta perguntas naturais, busca notícias reais e conduz o usuário pelo fluxo de análise.
+- **Chatbot conversacional:** Interpreta perguntas naturais, busca notícias e conduz o usuário pelo fluxo de análise.
 - **Transição de texto estilo GenAI:** Efeito de digitação progressiva nas respostas do bot.
 - **Sugestões inteligentes:** Botões de ação para resumo, planilha e dashboard.
-- **Busca flexível:** O backend filtra notícias por tema, palavra-chave e período.
+- **Busca flexível:** Filtra notícias por tema, palavra-chave e período.
 - **Dashboard dinâmico:** Indicadores principais, gráficos de evolução, tabelas de mídia, top fontes e top matérias.
 - **UI moderna:** Layout responsivo, header fixo, transições suaves, chat e dashboard lado a lado.
-- **Dados reais:** Processamento automático de planilha CSV com normalização de dados.
-
----
-
-## Endpoints Backend
-
-### Principais
-- `POST /api/noticias` — Busca notícias por termo (tema, palavra-chave, assunto).
-- `POST /api/dashboard` — Retorna indicadores agregados para o dashboard, aceita filtros opcionais:
-  - `termo`: palavra-chave/tema
-  - `periodo`: `{ inicio: 'YYYY-MM-DD', fim: 'YYYY-MM-DD' }`
-
-### Endpoints Inteligentes do Chat
-- `POST /api/chat/process` — Processa a mensagem do usuário, detecta intenção (saudação, funcionalidade, busca, ações) e retorna resposta contextual, sugestões e/ou ações.
-- `POST /api/chat/action` — Executa ação específica (resumo, planilha, dashboard) para o tema atual.
-- `GET /api/download/planilha?termo=...` — Gera e baixa a planilha CSV das notícias filtradas.
-
-### Administrativos
-- `GET /api/status` — Verifica status dos dados carregados
-- `POST /api/reload` — Recarrega dados do CSV (útil para desenvolvimento)
+- **Dados locais:** Processamento de dados JSON com normalização automática.
 
 ---
 
 ## Estrutura de Dados
 
-### Formato Esperado pelo Sistema
+### Formato dos Dados JSON
 Cada notícia possui os seguintes campos:
 - `id`: Identificador único
 - `titulo`: Título da notícia
@@ -242,7 +191,7 @@ Cada notícia possui os seguintes campos:
 - `impressoes`: Número de visualizações
 - `valoracao`: Valor monetário estimado
 
-### Campos Adicionais da Planilha Real
+### Campos Adicionais
 - `midia`: Tipo de mídia (Online/Offline)
 - `tier`: Classificação da fonte (Tier 1, Outros)
 - `analise_feita`: Status de análise
@@ -251,9 +200,9 @@ Cada notícia possui os seguintes campos:
 
 ---
 
-## Processamento de Dados CSV
+## Processamento de Dados
 
-O sistema inclui um processador automático (`csvProcessor.js`) que:
+O sistema inclui processamento automático de dados que:
 
 ### Conversões Automáticas
 - **Data:** Converte de DD/MM/YYYY HH:MM para YYYY-MM-DD
@@ -277,81 +226,74 @@ O sistema inclui um processador automático (`csvProcessor.js`) que:
 
 ## Base de Dados
 
-### Dados Reais
-- **Arquivo:** `backend/Biblioteca_de_publicacoes3.csv`
-- **Formato:** CSV com codificação UTF-8
-- **Campos:** Título, Data, Conteúdo, Fonte, Mídia, Tier, Alcance orgânico, Valoração, Empresas citadas, Análise feita?, Tipo de impacto, Assunto específico, Jornalistas
+### Dados JSON
+- **Arquivo:** `frontend/src/components/biblioteca_publicacoes_mock.json`
+- **Formato:** JSON com codificação UTF-8
+- **Origem:** Convertido do arquivo CSV original usando o script `csv_to_json.js`
+- **Tamanho:** Aproximadamente 1.1MB com dados reais de notícias
 
-### Dados Mockados (Fallback)
-- **Arquivo:** `backend/src/mockNoticias.js`
-- **Uso:** Quando o CSV não está disponível ou há erro no processamento
-- **Conteúdo:** 30 notícias fictícias sobre temas específicos
+### Script de Conversão
+- **Arquivo:** `frontend/csv_to_json.js`
+- **Função:** Converte dados CSV para formato JSON otimizado para o frontend
+- **Uso:** Executar manualmente quando necessário atualizar os dados
 
 ---
 
 ## Customização e Expansão
 
 ### Adicionar Novos Dados
-1. **Atualizar CSV:** Substitua ou adicione registros no arquivo `Biblioteca_de_publicacoes3.csv`
-2. **Recarregar:** Use o endpoint `POST /api/reload` ou reinicie o servidor
-3. **Verificar:** Use `GET /api/status` para confirmar o carregamento
+1. **Atualizar JSON:** Edite diretamente o arquivo `biblioteca_publicacoes_mock.json`
+2. **Ou converter CSV:** Use o script `csv_to_json.js` para converter novos dados CSV
+3. **Verificar formato:** Certifique-se de que os dados seguem a estrutura esperada
 
 ### Adicionar Novos Temas
-1. **Editar `index.js`:** Adicione novos termos na função `extrairTema()`
-2. **Reiniciar servidor:** Para aplicar as mudanças
+1. **Editar `Chat.js`:** Adicione novos termos na função de extração de tema
+2. **Reiniciar aplicação:** Para aplicar as mudanças
 
 ### Melhorar Análise de Sentimento
-1. **Editar `csvProcessor.js`:** Adicione palavras-chave nas arrays `palavrasPositivas` e `palavrasNegativas`
+1. **Editar `Chat.js`:** Adicione palavras-chave nas arrays de análise de sentimento
 2. **Implementar IA:** Substitua a análise básica por um modelo de machine learning
 
 ### Integrar APIs Reais
-1. **Substituir CSV:** Modifique `csvProcessor.js` para consumir APIs de notícias
+1. **Substituir JSON:** Modifique os componentes para consumir APIs de notícias
 2. **Manter formato:** Garanta que os dados retornem no formato esperado pelo sistema
 
 ---
 
-## Monitoramento e Debug
+## Deploy e Publicação
 
-### Endpoints de Status
-- `GET /api/status` — Mostra:
-  - Total de notícias carregadas
-  - Se está usando dados reais ou mockados
-  - Exemplo das primeiras 3 notícias
+### GitHub Pages
+O projeto está configurado para deploy automático no GitHub Pages:
 
-### Logs do Servidor
-O backend exibe logs informativos:
-- Carregamento de dados CSV
-- Número de notícias processadas
-- Erros de processamento (com fallback automático)
+1. **Configuração:** O `homepage` em `frontend/package.json` está configurado para o repositório
+2. **Build:** `npm run build:frontend` gera os arquivos de produção
+3. **Deploy:** `npm run deploy:frontend` publica no GitHub Pages
 
-### Recarregamento de Dados
-```bash
-# Via curl
-curl -X POST http://localhost:4000/api/reload
-
-# Via navegador
-POST http://localhost:4000/api/reload
-```
+### Outras Plataformas
+O projeto pode ser facilmente adaptado para outras plataformas de deploy:
+- **Netlify:** Conecte o repositório e configure o build command
+- **Vercel:** Importe o projeto e configure automaticamente
+- **AWS S3:** Faça upload dos arquivos de build
 
 ---
 
 ## Para Desenvolvedores
 
 ### Estrutura do Código
-- **Modular:** Separação clara entre processamento de dados e API
-- **Fallback:** Sistema robusto com dados mockados como backup
-- **Extensível:** Fácil adição de novos processadores e endpoints
+- **Modular:** Separação clara entre componentes de chat e dashboard
+- **Dados locais:** Sistema simples com dados JSON carregados no frontend
+- **Extensível:** Fácil adição de novos componentes e funcionalidades
 
 ### Fluxo de Dados
-1. **Inicialização:** Servidor carrega CSV automaticamente
-2. **Processamento:** Conversão e normalização de dados
-3. **Busca:** Filtros aplicados em tempo real
-4. **Resposta:** Dados formatados para frontend
+1. **Carregamento:** Dados JSON carregados no componente Chat
+2. **Processamento:** Filtros aplicados em tempo real no frontend
+3. **Busca:** Algoritmos de busca implementados no JavaScript
+4. **Resposta:** Dados formatados e exibidos nos componentes
 
 ### Performance
-- **Carregamento único:** Dados carregados na inicialização
-- **Busca em memória:** Filtros aplicados sem consultas ao disco
-- **Cache automático:** Dados mantidos em variável global
+- **Carregamento único:** Dados carregados uma vez na inicialização
+- **Busca em memória:** Filtros aplicados sem requisições externas
+- **Cache automático:** Dados mantidos em estado do React
 
 ---
 
@@ -359,6 +301,6 @@ POST http://localhost:4000/api/reload
 Dúvidas ou sugestões? Fale com o time de desenvolvimento ou consulte este README.
 
 ### Troubleshooting
-- **Erro de porta:** Use `lsof -ti:4000 | xargs kill -9` para liberar porta
-- **Dados não carregam:** Verifique se o arquivo CSV existe e está no formato correto
-- **Erro de processamento:** Verifique logs do servidor para detalhes específicos 
+- **Erro de porta:** Use `lsof -ti:3000 | xargs kill -9` para liberar porta
+- **Dados não carregam:** Verifique se o arquivo JSON existe e está no formato correto
+- **Erro de build:** Verifique se todas as dependências estão instaladas corretamente 
